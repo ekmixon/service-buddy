@@ -31,21 +31,21 @@ class TravisBuildCreator(object):
         # type: (Service, str) -> None
         if service_definition.get_service_type() not in self.build_templates:
             raise Exception(
-                "Build template not found for service type {}".format(service_definition.get_service_type()))
+                f"Build template not found for service type {service_definition.get_service_type()}"
+            )
+
         else:
             build_type = self.build_templates.get(service_definition.get_service_type())['type']
         service_dir = service_definition.get_service_directory(app_dir=app_dir)
         if os.path.exists(self._get_travis_file(service_dir)):
             logging.warn("travis build file exists - enabling repo")
             self._invoke_travis([ 'enable'], exec_dir=service_dir)
+        elif build_template := self.build_configuration.get(build_type, None):
+            self.create_build(service_dir, build_template,service_definition)
         else:
-            build_template = self.build_configuration.get(build_type,None)
-            if build_template:
-                self.create_build(service_dir, build_template,service_definition)
-            else:
-                logging.warn("Could not locate build template"
-                                             " for build type - {}:{}".format(service_definition.get_service_type(),
-                                                                              build_type))
+            logging.warn(
+                f"Could not locate build template for build type - {service_definition.get_service_type()}:{build_type}"
+            )
 
 
     def _get_travis_file(self, service_dir):
@@ -62,22 +62,17 @@ class TravisBuildCreator(object):
             language_
         ]
         if language_ == 'python':
-            args.append('--python')
-            args.append('2.7')
-
-        install_script = build_template.get('install', None)
-        if install_script:
+            args.extend(('--python', '2.7'))
+        if install_script := build_template.get('install', None):
             args.append('--install')
             self._append_rendered_arguments(args, install_script, service_definition)
 
-        script = build_template.get('script', None)
-        if script:
+        if script := build_template.get('script', None):
             args.append('--script')
             self._append_rendered_arguments(args, script, service_definition)
 
         self._invoke_travis(args, exec_dir=service_dir)
-        use_pypi = build_template.get('pypi-deploy', False)
-        if use_pypi:
+        if use_pypi := build_template.get('pypi-deploy', False):
             self._write_deploy_stanza(service_dir)
             self._invoke_travis([ 'encrypt', self.pypi_pass, '--add', 'deploy.password'], exec_dir=service_dir)
         invoke_process(['git', 'add','.travis.yml'],exec_dir=service_dir,dry_run=self.dry_run)
@@ -90,20 +85,21 @@ class TravisBuildCreator(object):
         for script in install_script:
             if "${" in script:
                 # Assume is there is bash style escape we don't python escape.  sucks but the extent of my attention
-                args.append("\"{}\"".format(script))
+                args.append(f'\"{script}\"')
             else:
                 args.append("\"{}\"".format(script.format(**service_definition)))
 
     def _write_deploy_stanza(self, service_dir):
         with open(self._get_travis_file(service_dir), 'a') as build_file:
-            build_file.writelines([
-                '\n'
-                'deploy\n',
-                '\tprovider: pypi\n',
-                '\tuser: {}\n'.format(self.pypi_user),
-                '\tdistributions: sdist bdist_wheel\n',
-                '\tserver: https://upload.pypi.org/legacy\n'
-            ])
+            build_file.writelines(
+                [
+                    '\n' 'deploy\n',
+                    '\tprovider: pypi\n',
+                    f'\tuser: {self.pypi_user}\n',
+                    '\tdistributions: sdist bdist_wheel\n',
+                    '\tserver: https://upload.pypi.org/legacy\n',
+                ]
+            )
 
     def _invoke_travis(self, args,exec_dir=None,append_org=True):
         base_args = ['travis']

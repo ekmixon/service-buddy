@@ -25,14 +25,17 @@ class BambooBuildCreator(object):
         self.build_templates = build_templates
         if user and password:
             with open('.credentials','w') as cred_file:
-                cred_file.writelines('username={}'.format(user))
-                cred_file.writelines('password={}'.format(password))
+                cred_file.writelines(f'username={user}')
+                cred_file.writelines(f'password={password}')
                 cred_file.flush()
 
     def create_project(self, service_definition, app_dir):
         logging.info("Creating bamboo build")
         if service_definition.get_service_type() not in self.build_templates:
-            raise Exception("Build template not found for service type {}".format(service_definition.get_service_type()))
+            raise Exception(
+                f"Build template not found for service type {service_definition.get_service_type()}"
+            )
+
 
         build_template = self.build_templates.get(service_definition.get_service_type())['type']
         args = [

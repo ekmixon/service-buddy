@@ -35,8 +35,24 @@ class ServiceLoadTestCase(ParentTestCase):
 
     def _validate_service_definition(self, app):
         for key, value in app.iteritems():
-            self.assertTrue(value.get_service_type()is not None, "Did not load service type for {}".format(key))
-            self.assertTrue(value.get_description() is not None, "Did not load service description for {}".format(key))
-            self.assertTrue(value.get_repository_name() is not None, "Did not load service repo name for {}".format(key))
-            self.assertTrue(value.repo_exists() is ("exists" in key), "Did not give rational response {}".format(key))
+            self.assertTrue(
+                value.get_service_type() is not None,
+                f"Did not load service type for {key}",
+            )
+
+            self.assertTrue(
+                value.get_description() is not None,
+                f"Did not load service description for {key}",
+            )
+
+            self.assertTrue(
+                value.get_repository_name() is not None,
+                f"Did not load service repo name for {key}",
+            )
+
+            self.assertTrue(
+                value.repo_exists() is ("exists" in key),
+                f"Did not give rational response {key}",
+            )
+
             self.assertTrue(value.get_contract_test_git_url() is None, "Did not get git url as expected")

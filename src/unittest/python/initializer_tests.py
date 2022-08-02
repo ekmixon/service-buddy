@@ -26,14 +26,22 @@ class InitTestCase(ParentTestCase):
         # type: (Service) -> None
         base_path = os.path.join(self.temp_dir, definition.get_app(), definition.get_fully_qualified_service_name())
         if "exists" in definition.get_fully_qualified_service_name():
-            self.assertFalse(os.path.exists(base_path), "Found code that should not exist - {}".format(base_path))
+            self.assertFalse(
+                os.path.exists(base_path),
+                f"Found code that should not exist - {base_path}",
+            )
+
             return
-        self.assertTrue(os.path.exists(base_path),
-                        "Did not find generated code base - {}".format(definition.get_fully_qualified_service_name()))
-        self.assertTrue(os.path.exists(os.path.join(base_path, "src")),
-                        "Did not find generated code directory '{}/src' - {}".format(
-                            base_path,
-                            definition.get_fully_qualified_service_name()))
+        self.assertTrue(
+            os.path.exists(base_path),
+            f"Did not find generated code base - {definition.get_fully_qualified_service_name()}",
+        )
+
+        self.assertTrue(
+            os.path.exists(os.path.join(base_path, "src")),
+            f"Did not find generated code directory '{base_path}/src' - {definition.get_fully_qualified_service_name()}",
+        )
+
         self.assertTrue(os.path.exists(os.path.join(base_path, "build.py")), "Did not find generated build file")
 
     def test_project_init(self):

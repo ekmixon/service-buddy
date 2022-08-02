@@ -50,7 +50,10 @@ class Initializer(object):
                 logging.info("Running git creation")
                 self.vcs.create_project(definition, app_dir)
         else:
-            logging.info("Service exists - {}".format(definition.get_fully_qualified_service_name()))
+            logging.info(
+                f"Service exists - {definition.get_fully_qualified_service_name()}"
+            )
+
 
         if self.skip_build_creation:
             logging.info("Skipping build creation")

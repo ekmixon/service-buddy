@@ -14,7 +14,7 @@ class TestBitbucketClient(object):
 class RepoReturn(object):
     def __init__(self, repository_name):
         super(RepoReturn, self).__init__()
-        self.clone ={"ssh": "ssh://git@bitbucket.org/{}".format(repository_name)}
+        self.clone = {"ssh": f"ssh://git@bitbucket.org/{repository_name}"}
 
 
 class BitbucketVCSInitTest(ParentTestCase):

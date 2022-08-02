@@ -15,7 +15,7 @@ from service_buddy.vcs.github_vcs import GitHubVCSProvider
 vcs_provider_map = {
     BitbucketVCSProvider.get_type(): BitbucketVCSProvider(),
     GitHubVCSProvider.get_type(): GitHubVCSProvider()}
-vcs_providers = [key for key in vcs_provider_map.iterkeys()]
+vcs_providers = list(vcs_provider_map.iterkeys())
 
 options = OrderedDict()
 options['root-user']="Organization name. team name or root user used by vcs provider"
@@ -25,20 +25,22 @@ class VCS(object):
     def __init__(self, service_directory, dry_run):
         super(VCS, self).__init__()
         default_path = os.path.join(service_directory, "vcs-config.json")
-        if os.path.exists(default_path):
-            with open(default_path) as fp:
-                defaults = json.load(fp)
-                self.default_provider = defaults.get('provider', None)
-                self.repo_root = defaults.get('root-user', os.environ.get('VCS_ROOT_USER'))
-                self.user = defaults.get('user', os.environ.get('VCS_USER'))
-                self.password = defaults.get('password', os.environ.get('VCS_PASSWORD'))
-        else:
+        if not os.path.exists(default_path):
             raise Exception("Could not local 'vcs-config.json' in service directory")
+        with open(default_path) as fp:
+            defaults = json.load(fp)
+            self.default_provider = defaults.get('provider', None)
+            self.repo_root = defaults.get('root-user', os.environ.get('VCS_ROOT_USER'))
+            self.user = defaults.get('user', os.environ.get('VCS_USER'))
+            self.password = defaults.get('password', os.environ.get('VCS_PASSWORD'))
         self.dry_run = dry_run
 
 
         if self.default_provider not in vcs_provider_map:
-            raise Exception("Requested provider is not configured {}".format(self.default_provider))
+            raise Exception(
+                f"Requested provider is not configured {self.default_provider}"
+            )
+
         else:
             self._get_default_vcs_provider().init(self.user, self.password, self.repo_root, dry_run)
 

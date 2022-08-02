@@ -12,7 +12,7 @@ def _wrap_with(code):
     def inner(text, bold=False):
         c = code
         if bold:
-            c = "1;%s" % c
+            c = f"1;{c}"
         return u"\033[%sm%s\033[0m" % (c, text)
 
     return inner

@@ -30,25 +30,36 @@ class GitHubVCSProvider(object):
             self.client = None
 
     def find_repo(self, service_definition):
-        fq_repository_name = "{}/{}".format(self.repo_root, service_definition.get_repository_name())
+        fq_repository_name = (
+            f"{self.repo_root}/{service_definition.get_repository_name()}"
+        )
+
         try:
             if self.client:
-                ssh_url = None
-                for repo in self.client.get_repos():
-                    if repo.name == fq_repository_name:
-                        ssh_url = repo.ssh_url
-                        break
+                ssh_url = next(
+                    (
+                        repo.ssh_url
+                        for repo in self.client.get_repos()
+                        if repo.name == fq_repository_name
+                    ),
+                    None,
+                )
+
             else:
-                ssh_url = 'ssh://git@github.com/{}'.format(fq_repository_name)
+                ssh_url = f'ssh://git@github.com/{fq_repository_name}'
                 result = invoke_process(args=['git', 'ls-remote', ssh_url, '>', '/dev/null'], exec_dir=None,
                                         dry_run=self.dry_run)
                 if result != 0:
-                    logging.info("Could not find repository with git executable - {}".format(
-                        service_definition.get_repository_name()))
+                    logging.info(
+                        f"Could not find repository with git executable - {service_definition.get_repository_name()}"
+                    )
+
                     ssh_url = None
             return ssh_url
         except HTTPError:
-            logging.info("Could not find repository through github API - {}".format(service_definition.get_repository_name()))
+            logging.info(
+                f"Could not find repository through github API - {service_definition.get_repository_name()}"
+            )
 
     def create_repo(self, service_defintion):
         # name, description=github.GithubObject.NotSet,
@@ -67,7 +78,7 @@ class GitHubVCSProvider(object):
             "has_wiki": False
         }
         if self.dry_run:
-            logging.error("Creating repo {}".format(str(payload)))
+            logging.error(f"Creating repo {payload}")
         else:
             if self.client is None:
                 raise Exception("VCS pass required for create repo operation")

@@ -21,8 +21,8 @@ class TestGitHubClient(object):
 class RepoReturn(object):
     def __init__(self, repository_name):
         super(RepoReturn, self).__init__()
-        self.name = "test/{}".format(repository_name)
-        self.ssh_url = "ssh://git@bitbucket.org/{}".format(repository_name)
+        self.name = f"test/{repository_name}"
+        self.ssh_url = f"ssh://git@bitbucket.org/{repository_name}"
 
 
 class GitHubVCSInitTest(ParentTestCase):

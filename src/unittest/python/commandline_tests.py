@@ -126,4 +126,8 @@ def test_init(self):
         self.service_templates_test
     ]
                            )
-    self.assertEqual(result.exit_code, 0, "Failed to run list successfully - {}".format(result.output))
+    self.assertEqual(
+        result.exit_code,
+        0,
+        f"Failed to run list successfully - {result.output}",
+    )

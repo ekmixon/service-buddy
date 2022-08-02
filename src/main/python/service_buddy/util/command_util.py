@@ -6,11 +6,10 @@ from service_buddy.util.log_handler import print_red_bold
 
 def invoke_process(args, exec_dir=None, dry_run=False):
     if dry_run:
-        print_red_bold(u"\t {}".format(str(args)))
+        print_red_bold(f"\t {str(args)}")
         return 0
     else:
-        arg_list = {'args': args}
-        arg_list['stderr'] = subprocess.STDOUT
+        arg_list = {'args': args, 'stderr': subprocess.STDOUT}
         if exec_dir:
             arg_list['cwd'] = exec_dir
 

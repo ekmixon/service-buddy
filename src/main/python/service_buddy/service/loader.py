@@ -15,7 +15,10 @@ def load_service_definitions(service_directory, app_filter=None, service_filter=
         if _is_valid_app(dir, service_dir) and application_filter(app_filter, dir):
             service_definition_file = os.path.join(service_dir, dir, 'service.json')
             if not os.path.exists(service_definition_file):
-                logging.warn("Skipping invalid application directory - no service.json exists - {}".format(service_dir))
+                logging.warn(
+                    f"Skipping invalid application directory - no service.json exists - {service_dir}"
+                )
+
             else:
                 service_map[dir] = Application(dir)
                 with open(service_definition_file) as service_def:
@@ -60,10 +63,7 @@ def ensure_service_directory_exists(destination_directory, service_defintion, cr
     app_dir = ensure_app_directory_exists(destination_directory=destination_directory,
                                           service_defintion=service_defintion)
     service_directory = service_defintion.get_service_directory(app_dir=app_dir)
-    if create:
-        safe_mkdir(service_directory)
-        return service_directory
-    else:
-        if os.path.exists(service_directory):
-            return service_directory
-        return None
+    if not create:
+        return service_directory if os.path.exists(service_directory) else None
+    safe_mkdir(service_directory)
+    return service_directory

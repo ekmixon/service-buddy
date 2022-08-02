@@ -59,12 +59,15 @@ class BitbucketVCSProvider(object):
         logging.info("Could not find repository through Bitbucket API - %r", fq_repository_name)
 
     def find_repo(self, service_definition):
-        fq_repository_name = "{}/{}".format(self.team_root_user, service_definition.get_repository_name())
+        fq_repository_name = (
+            f"{self.team_root_user}/{service_definition.get_repository_name()}"
+        )
+
         # logging.info("bitbucket find_repo: %r", fq_repository_name)
         if self.client:
             bitbucket_url = self._find_repo_api(fq_repository_name)
         else:
-            bitbucket_url = 'ssh://git@bitbucket.org/{}'.format(fq_repository_name)
+            bitbucket_url = f'ssh://git@bitbucket.org/{fq_repository_name}'
             result = invoke_process(
                 args=['git', 'ls-remote', bitbucket_url, '>', '/dev/null'], exec_dir=None, dry_run=self.dry_run
             )

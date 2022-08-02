@@ -7,7 +7,7 @@ from service_buddy.ci.travis_build_creator import TravisBuildCreator
 build_system_map = {
             BambooBuildCreator.get_type(): BambooBuildCreator(),
             TravisBuildCreator.get_type(): TravisBuildCreator()}
-build_systems = [key for key in build_system_map.iterkeys()]
+build_systems = list(build_system_map.iterkeys())
 
 
 class BuildCreator(object):
@@ -27,15 +27,17 @@ class BuildCreator(object):
             logging.warn("Could not local 'build-config.json' in code template directory")
             self.default_provider = "bamboo"
         if self.default_provider not in build_system_map:
-            raise Exception("Requested provider is not configured {}".format(self.default_provider))
-        else:
-            creator = self._get_default_build_creator()
-            creator.init(
-                dry_run=dry_run,
-                default_config=self.default_config,
-                build_templates=self.build_templates,
-                user=self.user, password=self.password
+            raise Exception(
+                f"Requested provider is not configured {self.default_provider}"
             )
+
+        creator = self._get_default_build_creator()
+        creator.init(
+            dry_run=dry_run,
+            default_config=self.default_config,
+            build_templates=self.build_templates,
+            user=self.user, password=self.password
+        )
 
     def _get_default_build_creator(self):
         # type: () -> BuildCreator

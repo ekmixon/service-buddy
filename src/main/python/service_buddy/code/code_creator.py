@@ -33,7 +33,9 @@ class CodeCreator(object):
                                                                             dry_run=dry_run,
                                                                             templates=self.templates)}
         if self.default_provider not in self.code_creators:
-            raise Exception("Requested provider is not configured {}".format(self.default_provider))
+            raise Exception(
+                f"Requested provider is not configured {self.default_provider}"
+            )
 
     def _resolve_alias(self, templates):
         ret = {}
@@ -61,7 +63,8 @@ class CodeCreator(object):
         project = self.get_default_code_creator().create_project(service_definition=service_definition,
                                                                  app_dir=app_dir,extra_config=extra_config)
         service_type_ = self.templates[service_definition.get_service_type()]
-        create_service_def = service_type_.get('generate-service-definition', True)
-        if create_service_def:
-           self.service_template_generator.create_project(service_definition,app_dir,service_type=service_type_.get('service-definition',None))
+        if create_service_def := service_type_.get(
+            'generate-service-definition', True
+        ):
+            self.service_template_generator.create_project(service_definition,app_dir,service_type=service_type_.get('service-definition',None))
         return project

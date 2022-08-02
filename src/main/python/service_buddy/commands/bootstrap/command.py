@@ -27,16 +27,15 @@ def bootstrap(service_ctx, application):
     directory = service_ctx.destination_directory
     if directory == "./code": #override default for this usecase
         directory = "./"
-    config = {}
     vcs_provider = click.prompt('Please select your source code repository', type=Choice(vcs.vcs_providers) )
-    config['vcs-provider'] = vcs_provider
+    config = {'vcs-provider': vcs_provider}
     vcs_options = vcs.options
-    for key,value in vcs_options.iteritems():
-        config['vcs_{}'.format(key)] = click.prompt("VCS: {} ({})".format(value,key))
+    for key, value in vcs_options.iteritems():
+        config[f'vcs_{key}'] = click.prompt(f"VCS: {value} ({key})")
     ci_provider = click.prompt('Please select your build system - ', type=Choice(ci.build_systems) )
     config['build-system-provider'] = ci_provider
     ci_options = ci.build_system_map[ci_provider].options()
-    for key,value in ci_options.iteritems():
-        config['build-system-{}'.format(key)] = click.prompt("Build System: {} ({})".format(value,key))
+    for key, value in ci_options.iteritems():
+        config[f'build-system-{key}'] = click.prompt(f"Build System: {value} ({key})")
     cc.create_project(service_definition=service_def, app_dir=directory,extra_config=config)
     

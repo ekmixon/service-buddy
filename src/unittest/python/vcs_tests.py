@@ -32,4 +32,4 @@ class VCSTestCase(ParentTestCase):
         vcs.clone_service(application_map=application_map, destination_directory="/tmp/out")
         for key, app in application_map.iteritems():
             for key, service in app.iteritems():
-                vcs.init_repo(service,"/tmp/out/{}".format(key))
+                vcs.init_repo(service, f"/tmp/out/{key}")
